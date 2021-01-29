@@ -162,8 +162,39 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// DeleteUser deletes a user record from the DB
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	// TYPE ONLY declarations of variables
+	var (
+		params      map[string]string
+		id          int
+		err         error
+		deletedRows int64
+		msg         string
+		res         response
+	)
+
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-", "*")
+	w.Header().Set("Access-Control-Allow-", "DELETE")
+	w.Header().Set("Access-Control-Allow-", "Content-Type")
+
+	params = mux.Vars(r)
+	id, err = strconv.Atoi(params["id"])
+	if err != nil {
+		log.Fatalf("Unable to conver the string into int. %v", err)
+	}
+
+	// TODO: implement deleteUser handler function
+	// deletedRows = deleteUser(int64(id))
+	msg = fmt.Sprintf("User deleted successfully. Total rows/record affected %v", deletedRows)
+	res.ID = int64(id)
+	res.Message = msg
+
+	json.NewEncoder(w).Encode(res)
+}
+
 // ============HANDLER FUNCTIONS============
-// insertUser puts the data into the DB
 func insertUser(user models.User) int64 {
 	var (
 		db           *sql.DB
@@ -216,7 +247,6 @@ func getUser(id int64) (models.user, error) {
 	return user, err
 }
 
-// getAllUser fetches all users from the DB
 func getAllUser() ([]models.User, error) {
 	var (
 		db           *sql.DB
@@ -249,7 +279,6 @@ func getAllUser() ([]models.User, error) {
 	return users, err
 }
 
-// updateUser updates a user entry in the DB
 func updateUser(id int64, user models.User) int64 {
 	var (
 		db           *sql.DB
