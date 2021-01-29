@@ -4,15 +4,14 @@ import (
 	"database/sql" // package to encode and decode the json into struct and vice versa
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"strconv"
-	// models package where User schema is defined
-	"log" // used to access the request and response object of the api
-	"os"  // used to read the environment variable
-	// package used to covert string into int type
-	// used to get the params from the route
+	"go-postgres-practice/models" // models package where User schema is defined
+	"log"
+	"net/http" // used to access the request and response object of the api
+	"os"       // used to read the environment variable
+	"strconv"  // package used to covert string into int type
 
-	"github.com/adrnl/go-postgres-practice/models"
+	"github.com/gorilla/mux" // used to get the params from the route
+
 	"github.com/joho/godotenv" // package used to read the .env file
 	_ "github.com/lib/pq"      // postgres golang driver
 )
@@ -88,8 +87,8 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		user models.User
 	)
 
-	w.header().Set("Context-Type", "application/x-www-form-urlencoded")
-	w.header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	// get the userid from the request params, key is "id"
 	params := mux.Vars(r)
 	// convert the id type from str to int
@@ -218,12 +217,13 @@ func insertUser(user models.User) int64 {
 	return id
 }
 
-func getUser(id int64) (models.user, error) {
+func getUser(id int64) (models.User, error) {
 	var (
 		db           *sql.DB
 		user         models.User
 		sqlStatement string
 		row          *sql.Row
+		err          error
 	)
 
 	db = createConnection()
