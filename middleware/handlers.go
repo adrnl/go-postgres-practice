@@ -2,13 +2,16 @@ package middleware
 
 import (
 	"database/sql" // package to encode and decode the json into struct and vice versa
+	"encoding/json"
 	"fmt"
+	"net/http"
 	// models package where User schema is defined
 	"log" // used to access the request and response object of the api
 	"os"  // used to read the environment variable
 	// package used to covert string into int type
 	// used to get the params from the route
 
+	"github.com/adrnl/go-postgres-practice/models"
 	"github.com/joho/godotenv" // package used to read the .env file
 	_ "github.com/lib/pq"      // postgres golang driver
 )
@@ -45,4 +48,34 @@ func createConnection() *sql.DB {
 	fmt.Println("Successful Connection")
 
 	return db
+}
+
+// CreateUser creates a user in the postgres db
+func CreateUser(w http.ResponseWriter, r *http.Request) {
+	var (
+		err      error
+		user     models.User
+		insertID int64
+		res      response
+	)
+
+	// set the header to content type x-www-form-urlencoded
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	// allow all origin to handle cors issue
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	// decode json into user object
+	err = json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		log.Fatalf("Unable to decode the json request body. %v", err)
+	}
+
+	// TODO: insertUser function
+	// insertID = insertUser(user)
+	res.ID = insertID
+	res.Message = "User created successfully"
+
+	json.NewEncoder(w).Encode(res)
 }
