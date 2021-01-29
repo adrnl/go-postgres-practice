@@ -117,8 +117,7 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	// TODO: getAllUser handler function
-	// users, err = getAllUser()
+	users, err = getAllUser()
 	if err != nil {
 		log.Fatalf("Unable to get all users. %v", err)
 	}
@@ -178,4 +177,37 @@ func getUser(id int64) (models.user, error) {
 	}
 
 	return user, err
+}
+
+// getAllUser fetches all users from the DB
+func getAllUser() ([]models.User, error) {
+	var (
+		db           *sql.DB
+		users        []models.User
+		sqlStatement string
+		rows         *sql.Rows
+		err          error
+	)
+
+	db = createConnection()
+	defer db.Close()
+
+	sqlStatement = `SELECT * FROM users`
+	rows, err = db.Query(sqlStatement)
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var user models.User
+		err = rows.Scan(&user.ID, &user.Name, &user.Age, &user.Location)
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		users = append(users, user)
+	}
+
+	return users, err
 }
