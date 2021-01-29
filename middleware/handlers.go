@@ -98,8 +98,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Unable to convert the string into int. %v", err)
 	}
 
-	// TODO: getUser handler function
-	// user, err = getUser(int64(id))
+	user, err = getUser(int64(id))
 	if err != nil {
 		log.Fatalf("Unable to get user. %v", err)
 	}
@@ -132,4 +131,32 @@ func insertUser(user models.User) int64 {
 	fmt.Printf("inserted a single record %v", id)
 
 	return id
+}
+
+func getUser(id int64) (models.user, error) {
+	var (
+		db           *sql.DB
+		user         models.User
+		sqlStatement string
+		row          *sql.Row
+	)
+
+	db = createConnection()
+	defer db.Close()
+
+	sqlStatement = `SELECT * FROM users WHERE userid=$1`
+	row = db.QueryRow(sqlStatement, id)
+	err = row.Scan(&user.ID, &user.Name, &user.Age, &user.Location)
+
+	switch err {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned")
+		return user, nil
+	case nil:
+		return user, nil
+	default:
+		log.Fatalf("Unable to scan the row. %v", err)
+	}
+
+	return user, err
 }
