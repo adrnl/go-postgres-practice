@@ -83,7 +83,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 // GetUser fetches a user by ID
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	var (
-		id   int64
+		id   int
 		err  error
 		user models.User
 	)
@@ -123,6 +123,44 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(users)
+}
+
+// UpdateUser updates a user's information in the DB
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var (
+		params      map[string]string
+		id          int
+		err         error
+		user        models.User
+		updatedRows int64
+		msg         string
+		res         response
+	)
+
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "PUT")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	params = mux.Vars(r)
+	id, err = strconv.Atoi(params["id"])
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int. %v", err)
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		log.Fatalf("Unable to decode the request body. %v", err)
+	}
+
+	// TODO updateUser handler function
+	// updatedRows = updateUser(int64(id), user)
+	msg = fmt.Sprintf("User updated successfully. Total rows/record affected %v", updatedRows)
+
+	res.ID = int64(id)
+	res.Message = msg
+
+	json.NewEncoder(w).Encode(res)
 }
 
 // ============HANDLER FUNCTIONS============
