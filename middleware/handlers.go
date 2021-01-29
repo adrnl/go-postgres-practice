@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	// models package where User schema is defined
 	"log" // used to access the request and response object of the api
 	"os"  // used to read the environment variable
@@ -79,7 +80,36 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-// HANDLER FUNCTIONS
+// GetUser fetches a user by ID
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	var (
+		id   int64
+		err  error
+		user models.User
+	)
+
+	w.header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.header().Set("Access-Control-Allow-Origin", "*")
+	// get the userid from the request params, key is "id"
+	params := mux.Vars(r)
+	// convert the id type from str to int
+	id, err = strconv.Atoi(params["id"])
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int. %v", err)
+	}
+
+	// TODO: getUser handler function
+	// user, err = getUser(int64(id))
+	if err != nil {
+		log.Fatalf("Unable to get user. %v", err)
+	}
+
+	// send response
+	json.NewEncoder(w).Encode(user)
+}
+
+// ============HANDLER FUNCTIONS============
+// insertUser puts the data into the DB
 func insertUser(user models.User) int64 {
 	var (
 		db           *sql.DB
@@ -91,7 +121,7 @@ func insertUser(user models.User) int64 {
 	db = createConnection()
 	defer db.Close()
 
-	// cfreate insert SQL query; returning userid will return the newly created user's ID
+	// create insert SQL query; returning userid will return the newly created user's ID
 	sqlStatement = `INSERT INTO users (name, location, age) VALUES ($1, $2, $3) RETURNING userid`
 
 	err = db.QueryRow(sqlStatement, user.Name, user.Location, user.Age).Scan(&id)
