@@ -107,6 +107,25 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
+// GetAllUser fetches all users
+func GetAllUser(w http.ResponseWriter, r *http.Request) {
+	var (
+		users []models.User
+		err   error
+	)
+
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// TODO: getAllUser handler function
+	// users, err = getAllUser()
+	if err != nil {
+		log.Fatalf("Unable to get all users. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(users)
+}
+
 // ============HANDLER FUNCTIONS============
 // insertUser puts the data into the DB
 func insertUser(user models.User) int64 {
