@@ -72,10 +72,34 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Unable to decode the json request body. %v", err)
 	}
 
-	// TODO: insertUser function
-	// insertID = insertUser(user)
+	insertID = insertUser(user)
 	res.ID = insertID
 	res.Message = "User created successfully"
 
 	json.NewEncoder(w).Encode(res)
+}
+
+// HANDLER FUNCTIONS
+func insertUser(user models.User) int64 {
+	var (
+		db           *sql.DB
+		sqlStatement string
+		id           int64
+		err          error
+	)
+
+	db = createConnection()
+	defer db.Close()
+
+	// cfreate insert SQL query; returning userid will return the newly created user's ID
+	sqlStatement = `INSERT INTO users (name, location, age) VALUES ($1, $2, $3) RETURNING userid`
+
+	err = db.QueryRow(sqlStatement, user.Name, user.Location, user.Age).Scan(&id)
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	fmt.Printf("inserted a single record %v", id)
+
+	return id
 }
