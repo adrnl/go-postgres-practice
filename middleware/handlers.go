@@ -153,8 +153,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Unable to decode the request body. %v", err)
 	}
 
-	// TODO updateUser handler function
-	// updatedRows = updateUser(int64(id), user)
+	updatedRows = updateUser(int64(id), user)
 	msg = fmt.Sprintf("User updated successfully. Total rows/record affected %v", updatedRows)
 
 	res.ID = int64(id)
@@ -248,4 +247,31 @@ func getAllUser() ([]models.User, error) {
 	}
 
 	return users, err
+}
+
+// updateUser updates a user entry in the DB
+func updateUser(id int64, user models.User) int64 {
+	var (
+		db           *sql.DB
+		sqlStatement string
+		res          sql.Result
+		err          error
+		rowsAffected int64
+	)
+
+	db = createConnection()
+	defer db.Close()
+	sqlStatement = `UPDATE users SET name=$2, location=$3, age=$4 WHERE userid=$1`
+	res, err = db.Exec(sqlStatement, id, user.Name, user.Location, user.Age)
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	rowsAffected, err = res.RowsAffected()
+	if err != nil {
+		log.Fatalf("Error while checking the number of affected rows. %v", err)
+	}
+
+	fmt.Printf("Total rows/record affected %v", rowsAffected)
+	return rowsAffected
 }
