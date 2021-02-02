@@ -1,4 +1,4 @@
-package middleware
+package user
 
 import (
 	"database/sql" // package to encode and decode the json into struct and vice versa
@@ -7,48 +7,12 @@ import (
 	"go-postgres-practice/models" // models package where User schema is defined
 	"log"
 	"net/http" // used to access the request and response object of the api
-	"os"       // used to read the environment variable
 	"strconv"  // package used to covert string into int type
 
 	"github.com/gorilla/mux" // used to get the params from the route
 
-	"github.com/joho/godotenv" // package used to read the .env file
-	_ "github.com/lib/pq"      // postgres golang driver
+	_ "github.com/lib/pq" // postgres golang driver
 )
-
-type response struct {
-	ID      int64  `json:"id,omitempty"`
-	Message string `json:"message,omitempty"`
-}
-
-func createConnection() *sql.DB {
-	var (
-		err error
-		db  *sql.DB
-	)
-
-	// load .env file
-	err = godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env")
-	}
-
-	// open connection to database
-	db, err = sql.Open("postgres", os.Getenv("POSTGRES_URL"))
-	if err != nil {
-		panic(err)
-	}
-
-	// check connection to database
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successful Connection")
-
-	return db
-}
 
 // CreateUser creates a user in the postgres db
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +20,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		err      error
 		user     models.User
 		insertID int64
-		res      response
+		res      models.Response
 	)
 
 	// set the header to content type x-www-form-urlencoded
@@ -133,7 +97,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		user        models.User
 		updatedRows int64
 		msg         string
-		res         response
+		res         models.Response
 	)
 
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
@@ -170,7 +134,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		err         error
 		deletedRows int64
 		msg         string
-		res         response
+		res         models.Response
 	)
 
 	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
@@ -201,7 +165,7 @@ func insertUser(user models.User) int64 {
 		err          error
 	)
 
-	db = createConnection()
+	db = models.CreateConnection()
 	defer db.Close()
 
 	// create insert SQL query; returning userid will return the newly created user's ID
@@ -226,7 +190,7 @@ func getUser(id int64) (models.User, error) {
 		err          error
 	)
 
-	db = createConnection()
+	db = models.CreateConnection()
 	defer db.Close()
 
 	sqlStatement = `SELECT * FROM users WHERE userid=$1`
@@ -255,7 +219,7 @@ func getAllUser() ([]models.User, error) {
 		err          error
 	)
 
-	db = createConnection()
+	db = models.CreateConnection()
 	defer db.Close()
 
 	sqlStatement = `SELECT * FROM users`
@@ -287,7 +251,7 @@ func updateUser(id int64, user models.User) int64 {
 		rowsAffected int64
 	)
 
-	db = createConnection()
+	db = models.CreateConnection()
 	defer db.Close()
 	sqlStatement = `UPDATE users SET name=$2, location=$3, age=$4 WHERE userid=$1`
 	res, err = db.Exec(sqlStatement, id, user.Name, user.Location, user.Age)
@@ -313,7 +277,7 @@ func deleteUser(id int64) int64 {
 		rowsAffected int64
 	)
 
-	db = createConnection()
+	db = models.CreateConnection()
 	defer db.Close()
 
 	sqlStatement = `DELETE FROM users WHERE userid=$1`
