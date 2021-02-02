@@ -1,7 +1,7 @@
 package router
 
 import (
-	"go-postgres-practice/middleware"
+	"go-postgres-practice/middleware/user"
 
 	"github.com/gorilla/mux"
 )
@@ -12,11 +12,11 @@ func Router() *mux.Router {
 
 	router = mux.NewRouter()
 
-	router.HandleFunc("/api/user/{id}", middleware.GetUser).Methods("GET", "OPTIONS")
-	router.HandleFunc("/api/user", middleware.GetAllUser).Methods("GET", "OPTIONS")
-	router.HandleFunc("/api/newuser", middleware.CreateUser).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/user/{id}", middleware.UpdateUser).Methods("PUT", "OPTIONS")
-	router.HandleFunc("/api/deleteuser/{id}", middleware.DeleteUser).Methods("DELETE", "OPTIONS")
+	router.HandleFunc("/api/user/{id}", user.GetUser).Methods("GET", "OPTIONS")
+	router.HandleFunc("/api/user", user.GetAllUser).Methods("GET", "OPTIONS")
+	router.HandleFunc("/api/newuser", user.CreateUser).Methods("POST", "OPTIONS")
+	router.HandleFunc("/api/user/{id}", user.UpdateUser).Methods("PUT", "OPTIONS")
+	router.HandleFunc("/api/deleteuser/{id}", user.DeleteUser).Methods("DELETE", "OPTIONS")
 
 	return router
 }
