@@ -176,7 +176,7 @@ func insertUser(user models.User) int64 {
 		log.Fatalf("Unable to execute the query. %v", err)
 	}
 
-	fmt.Printf("inserted a single record %v", id)
+	fmt.Printf("Inserted a single record %v", id)
 
 	return id
 }
