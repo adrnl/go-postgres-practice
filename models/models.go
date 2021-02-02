@@ -23,6 +23,13 @@ type User struct {
 	Age      int64  `json:"age"`
 }
 
+// Product Schema
+type Product struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+	MSRP int64  `json:"msrp"`
+}
+
 // CreateConnection establishes a connection to the DB
 func CreateConnection() *sql.DB {
 	var (
