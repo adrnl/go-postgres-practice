@@ -1,3 +1,4 @@
+github.com/adrnl/go-postgres-practice v0.0.0-20210202003601-055d678b6c35 h1:BefL1UrrOOyDIzw/cKVSp88aKeCrKb+c8cfcsCh+fpA=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
 github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
