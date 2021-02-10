@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"go-postgres-practice/models"
+
+	"github.com/gorilla/mux"
 )
 
 // CreateProduct creates a product entry in the DB
@@ -36,6 +39,32 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+//GetProduct fetches a product by ID
+func GetProduct(w http.ResponseWriter, r *http.Request) {
+	var (
+		params  map[string]string
+		id      int
+		err     error
+		product models.Product
+	)
+
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	params = mux.Vars(r)
+	id, err = strconv.Atoi(params["id"])
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int. %v", err)
+	}
+
+	product, err = getProduct(int64(id))
+	if err != nil {
+		log.Fatalf("Unable to get product. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(product)
+}
+
 // ============HANDLER FUNCTIONS============
 func insertProduct(product models.Product) int64 {
 	var (
@@ -58,4 +87,33 @@ func insertProduct(product models.Product) int64 {
 	fmt.Printf("Inserted a single record %v", id)
 
 	return id
+}
+
+func getProduct(id int64) (models.Product, error) {
+	var (
+		db           *sql.DB
+		product      models.Product
+		sqlStatement string
+		row          *sql.Row
+		err          error
+	)
+
+	db = models.CreateConnection()
+	defer db.Close()
+
+	sqlStatement = `SELECT * FROM products WHERE productid=$1`
+	row = db.QueryRow(sqlStatement, id)
+	err = row.Scan(&product.ID, &product.Name, &product.MSRP)
+
+	switch err {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned")
+		return product, nil
+	case nil:
+		return product, nil
+	default:
+		log.Fatalf("Unable to scan the row. %v", err)
+	}
+
+	return product, err
 }
