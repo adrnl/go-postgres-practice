@@ -46,15 +46,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 // GetUser fetches a user by ID
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	var (
-		id   int
-		err  error
-		user models.User
+		params map[string]string
+		id     int
+		err    error
+		user   models.User
 	)
 
 	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	// get the userid from the request params, key is "id"
-	params := mux.Vars(r)
+	params = mux.Vars(r)
 	// convert the id type from str to int
 	id, err = strconv.Atoi(params["id"])
 	if err != nil {
