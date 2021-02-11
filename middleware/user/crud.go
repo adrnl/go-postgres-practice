@@ -254,6 +254,7 @@ func updateUser(id int64, user models.User) int64 {
 
 	db = models.CreateConnection()
 	defer db.Close()
+
 	sqlStatement = `UPDATE users SET name=$2, location=$3, age=$4 WHERE userid=$1`
 	res, err = db.Exec(sqlStatement, id, user.Name, user.Location, user.Age)
 	if err != nil {
