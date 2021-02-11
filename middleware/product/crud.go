@@ -149,3 +149,30 @@ func getAllProduct() ([]models.Product, error) {
 
 	return products, err
 }
+
+func updateProduct(id int64, product models.Product) int64 {
+	var (
+		db           *sql.DB
+		sqlStatement string
+		res          sql.Result
+		err          error
+		rowsAffected int64
+	)
+
+	db = models.CreateConnection()
+	defer db.Close()
+
+	sqlStatement = `UPDATE product SET name=$2, msrp=$3 WHERE productid=$1`
+	res, err = db.Exec(sqlStatement, id, product.Name, product.MSRP)
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	rowsAffected, err = res.RowsAffected()
+	if err != nil {
+		log.Fatalf("Error while checking the number of affected rows. %v", err)
+	}
+
+	fmt.Printf("Total rows/records affected %v", rowsAffected)
+	return rowsAffected
+}
