@@ -117,3 +117,35 @@ func getProduct(id int64) (models.Product, error) {
 
 	return product, err
 }
+
+func getAllProduct() ([]models.Product, error) {
+	var (
+		db           *sql.DB
+		products     []models.Product
+		sqlStatement string
+		rows         *sql.Rows
+		err          error
+	)
+
+	db = models.CreateConnection()
+	defer db.Close()
+
+	sqlStatement = `SELECT * FROM product`
+	rows, err = db.Query(sqlStatement)
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var product models.Product
+		err = rows.Scan(&product.ID, &product.Name, &product.MSRP)
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		products = append(products, product)
+	}
+
+	return products, err
+}
