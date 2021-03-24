@@ -194,3 +194,30 @@ func updateProduct(id int64, product models.Product) int64 {
 	fmt.Printf("Total rows/records affected %v", rowsAffected)
 	return rowsAffected
 }
+
+func deleteProduct(id int64) int64 {
+	var (
+		db           *sql.DB
+		sqlStatement string
+		res          sql.Result
+		err          error
+		rowsAffected int64
+	)
+
+	db = models.CreateConnection()
+	defer db.Close()
+
+	sqlStatement = `DELETE FROM products WHERE productid=$1`
+	res, err = db.Exec(sqlStatement, id)
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	rowsAffected, err = res.RowsAffected()
+	if err != nil {
+		log.Fatalf("Error while checking the number of affected rows. %v", err)
+	}
+
+	fmt.Printf("Total rows/record affected %v", rowsAffected)
+	return rowsAffected
+}
