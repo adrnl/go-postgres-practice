@@ -65,6 +65,24 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(product)
 }
 
+// GetAllProduct fetches all products
+func GetAllProduct(w http.ResponseWriter, r *http.Request) {
+	var (
+		products []models.Product
+		err      error
+	)
+
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	products, err = getAllProduct()
+	if err != nil {
+		log.Fatalf("Unable to get all products. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(products)
+}
+
 // ============HANDLER FUNCTIONS============
 func insertProduct(product models.Product) int64 {
 	var (
